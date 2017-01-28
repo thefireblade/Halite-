@@ -38,7 +38,7 @@ public class MyBot {
             boolean enemyPresent(Loa)
             while (enemyPresent) {
                 for ( square.get(y) -
-                        // x1 - x2 + y1 - y2 //
+
 
 
             }
@@ -50,6 +50,9 @@ public class MyBot {
 
     }
 
-    public static void
+    public static void humanEnemy() {
+
+        
+    }
 
 }
