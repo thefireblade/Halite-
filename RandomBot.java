@@ -26,7 +26,5 @@ public class RandomBot {
             }
             Networking.sendFrame(moves);
         }
-
     }
-    p
 }

@@ -15,7 +15,7 @@ public class Location {
     }
 
     public int getY() {
-        return y; }
+        return y;
     }
 
     public Site getSite() {
