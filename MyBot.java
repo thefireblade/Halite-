@@ -2,7 +2,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MyBot {
-    GameMap gameMap = new GameMap();
+
     public static void main(String[] args) throws java.io.IOException {
 
         final InitPackage iPackage = Networking.getInit();
@@ -22,13 +22,13 @@ public class MyBot {
                     final Location location = gameMap.getLocation(x, y);
                     final Site site = location.getSite();
                     if (site.owner == myID) {
-                        moves.add(new Move(location, moveToLocation(location,locationAfterDirection(weakestSite(location)))));
+                        moves.add(new Move(location, moveToLocation(location,locationAfterDirection(location, weakestSite(location), gameMap))));
                       /*  if (nextToEnemy()) {
                             moves.add(new Move(location, moveToLocation(weakestSite(location))));
                         } else {
                             moves.add(new Move(location, );
                     }
-                    moves.add(new Move(location, Direction.randomDirection()));  */
+                    moves.add(new Move(location, Direction.randomDirec=tion()));  */
                     }
                 }
 
@@ -54,19 +54,18 @@ public class MyBot {
     }
     */
 
-    private static Location locationAfterDirection(Location location, Direction direction) {
-        Direction NORTH, SOUTH, WEST, EAST;
-        if (direction.equals(NORTH)) {
-            return Location(location.getX(),location.getY()+1);
+    private static Location locationAfterDirection(Location location, Direction direction, GameMap gameMap) {
+        if (Direction.NORTH.equals(direction)) {
+            return gameMap.getLocation(location.getX(),location.getY()+1);
         }
-        if (direction.equals(SOUTH)) {
-            return Location(location.getX(),location.getY()-1);
+        if (Direction.SOUTH.equals(direction)) {
+            return gameMap.getLocation(location.getX(),location.getY()-1);
         }
-        if (direction.equals(WEST)) {
-            return Location(location.getX()-1);
+        if (Direction.WEST.equals(direction)) {
+            return gameMap.getLocation((location.getX()-1), location.getY());
         }
-        if (direction.equals(EAST)) {
-            return Location(location.getX()+1);
+        if (Direction.EAST == direction) {
+            return gameMap.getLocation(location.getX()+1, location.getY());
         }
         return location;
     }
@@ -75,37 +74,31 @@ public class MyBot {
 
     private static Direction weakestSite(Location location) {
 
-            int[] t1 = {location.getX() + 1, location.getY().getSite().strength};
-            int[] t2 = {location.getX() - 1, location.getY().getSite().strength};
-            int[] t3 = {location.getX(), location.getY() + 1).getSite().strength};
-            int[] t4 = {location.getX(), location.getY() - 1).getSite().strength};
-            int[] t = {t1, t2, t3, t4};
-            Direction direction, EAST, WEST, NORTH, SOUTH;
-            Direction[] dir = {EAST, WEST, NORTH, SOUTH};
-            int weakest = 255;
-            for (int i = 0; i < 4; i++) {
-                if (t[i] <= weakest) {
-                    weakest = t[i];
-                    direction = dir[i];
-                }
+        int[] t1 = {(location.getX() + 1), location.getSite().strength};
+        int[] t2 = {(location.getX() - 1), location.getSite().strength};
+        int[] t3 = {location.getY() + 1, location.getSite().strength};
+        int[] t4 = {location.getY() - 1, location.getSite().strength};
+        int[][] t = {t3, t1, t4, t2};
+        int weakest = 255;
+
+        for (int i = 0; i < 4; i++) {
+            if (t[i][0] <= weakest) {
+                weakest = t[i][0];
             }
-            return direction;
-
-
-
+        }
+        return direction.get(0);
     }
 
-    private boolean ally(Location location) {
 
-        final int myID = iPackage.myID;
+
+    private boolean ally(Location location, int myID) {
         return location.getSite().owner == myID;
     }
 
-    private Location nearestEnemy(Location loc) {
-        final int myID = iPackage.myID;
-        Location EndOfTheMap = new Location(gameMap.height, gameMap.width);
-        Location CornerOfMap = new Location(0, 0);
-        distance = getDistance(CornerOfMap, EndOfTheMap);
+    private Location nearestEnemy(Location loc, int myID, GameMap gameMap) {
+        Location EndOfTheMap = new gameMap.getLocation(gameMap.height, gameMap.width);
+        Location CornerOfMap = new gameMap.getLocation(0, 0);
+        int distance = getDistance(CornerOfMap, EndOfTheMap);
         Location closest = loc;
             for (int y = 0; y < gameMap.height; y++) {
                 for (int x = 0; x < gameMap.width; x++) {
@@ -120,12 +113,12 @@ public class MyBot {
         return closest;
     }
 // combine the for loops
-    private boolean nextToEnemy() {
+    private boolean nextToEnemy(int myID, GameMap gameMap) {
         for (int y = 0; y < gameMap.height; y++) {
             for (int x = 0; x < gameMap.width; x++) {
                 final Location location = gameMap.getLocation(x, y);
                 final Site site = location.getSite();
-                if (2 == getDistance(nearestEnemy(location))) {
+                if (2 == getDistance(nearestEnemy(location, myID, gameMap))) {
                     return true;
                 }
             }
@@ -143,23 +136,23 @@ public class MyBot {
        therefore a loop should be set up to end the direction when the positions or equal otherwise there would be an error */
 
     private static Direction moveToLocation(Location locationStart, Location locationFinish) {
-        Direction WEST,EAST,SOUTH,NORTH;
+
         int[] x = {locationStart.getX, locationFinish.getX};
         int[] y = {locationStart.getY, locationFinish.getY};
-        if (x[1] != x[2]) {
-            if(x[1] > x[2]) {
-                return WEST;
+        if (x[0] != x[1]) {
+            if(x[0] > x[1]) {
+                return Direction.WEST;
             } else {
-                return EAST;
+                return Direction.EAST;
             }
-        } else if (y[1] != y[2]) {
-            if(y[1] > y[2]) {
-                return SOUTH;
+        } else if (y[0] != y[1]) {
+            if(y[0] > y[1]) {
+                return Direction.SOUTH;
             } else {
-                return NORTH;
+                return Direction.NORTH;
             }
         } else {
-            return NORTH; // Returns north if the values match
+            return Direction.NORTH; // Returns north if the values match
         }
     }
 
