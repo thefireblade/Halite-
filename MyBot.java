@@ -8,8 +8,6 @@ public class MyBot {
         final InitPackage iPackage = Networking.getInit();
         final int myID = iPackage.myID;
         final GameMap gameMap = iPackage.map;
-
-
         Networking.sendInit("JasonTheDestroyer");
 
         while (true) {
@@ -22,7 +20,7 @@ public class MyBot {
                     final Location location = gameMap.getLocation(x, y);
                     final Site site = location.getSite();
                     if (site.owner == myID) {
-                        moves.add(new Move(location, moveToLocation(location,locationAfterDirection(location, weakestSite(location), gameMap))));
+                        moves.add(new Move(location, moveToLocation(location,locationAfterDirection(location, weakestSite(location)))));
                       /*  if (nextToEnemy()) {
                             moves.add(new Move(location, moveToLocation(weakestSite(location))));
                         } else {
@@ -54,7 +52,7 @@ public class MyBot {
     }
     */
 
-    private static Location locationAfterDirection(Location location, Direction direction, GameMap gameMap) {
+    private Location locationAfterDirection(Location location, Direction direction, GameMap gameMap) {
         if (Direction.NORTH.equals(direction)) {
             return gameMap.getLocation(location.getX(),location.getY()+1);
         }
@@ -72,30 +70,41 @@ public class MyBot {
 
 
 
-    private static Direction weakestSite(Location location) {
+    private Direction weakestSite(Location location, GameMap gameMap) {
 
         int[] t1 = {(location.getX() + 1), location.getSite().strength};
         int[] t2 = {(location.getX() - 1), location.getSite().strength};
         int[] t3 = {location.getY() + 1, location.getSite().strength};
         int[] t4 = {location.getY() - 1, location.getSite().strength};
         int[][] t = {t3, t1, t4, t2};
-        int weakest = 255;
+        int locationStrength = 255;
+        int weakest;
 
         for (int i = 0; i < 4; i++) {
-            if (t[i][0] <= weakest) {
-                weakest = t[i][0];
+            if (t[i][1] <= locationStrength) {
+                weakest = i;
+                locationStrength =  t[i][2];
             }
         }
-        return direction.get(0);
+        if (weakest == 1) {
+            return Direction.NORTH;
+        } else if (weakest == 2) {
+            return Direction.EAST;
+        } else if (weakest == 3) {
+            return Direction.SOUTH;
+        } else if (weakest == 4) {
+            return Direction.WEST;
+        }
+
+        return Direction.NORTH;
+
     }
 
 
 
-    private boolean ally(Location location, int myID) {
-        return location.getSite().owner == myID;
-    }
+    private boolean ally(Location location) { return location.getSite().owner == myID; }
 
-    private Location nearestEnemy(Location loc, int myID, GameMap gameMap) {
+    private Location nearestEnemy(Location loc, GameMap gameMap) {
         Location EndOfTheMap = new gameMap.getLocation(gameMap.height, gameMap.width);
         Location CornerOfMap = new gameMap.getLocation(0, 0);
         int distance = getDistance(CornerOfMap, EndOfTheMap);
@@ -113,12 +122,12 @@ public class MyBot {
         return closest;
     }
 // combine the for loops
-    private boolean nextToEnemy(int myID, GameMap gameMap) {
+    private boolean nextToEnemy(GameMap gameMap) {
         for (int y = 0; y < gameMap.height; y++) {
             for (int x = 0; x < gameMap.width; x++) {
                 final Location location = gameMap.getLocation(x, y);
                 final Site site = location.getSite();
-                if (2 == getDistance(nearestEnemy(location, myID, gameMap))) {
+                if (1 == getDistance(nearestEnemy(location))) {
                     return true;
                 }
             }
@@ -135,7 +144,7 @@ public class MyBot {
     /* This method identifies the direciton in which all of the blocks move, does not work if the positions are the same
        therefore a loop should be set up to end the direction when the positions or equal otherwise there would be an error */
 
-    private static Direction moveToLocation(Location locationStart, Location locationFinish) {
+    private Direction moveToLocation(Location locationStart, Location locationFinish) {
 
         int[] x = {locationStart.getX, locationFinish.getX};
         int[] y = {locationStart.getY, locationFinish.getY};
